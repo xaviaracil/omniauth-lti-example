@@ -1,0 +1,18 @@
+.alert.alert-success
+	Launched tool with
+	%code= current_user.name
+	user.
+
+.alert.alert-info
+	%p
+		This application has been launched from 
+		%code
+			=lti_tool_provider.resource_link_title
+			(
+			=lti_tool_provider.resource_link_id
+			)
+	%p
+		The key used for the tool_provider is
+		%code=lti_tool_provider.consumer_key
+		and the secret is
+		%code=lti_tool_provider.consumer_secret
