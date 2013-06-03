@@ -5,7 +5,7 @@ gem 'rails', '3.2.13'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3', :group => :development
+gem 'sqlite3', :group => [:development, :test]
 gem 'pg', :group => :production
 
 
@@ -42,7 +42,6 @@ gem "haml-rails", ">= 0.4"
 gem "html2haml", ">= 1.0.1", :group => :development
 gem "bootstrap-sass", ">= 2.3.0.0"
 gem "omniauth", ">= 1.1.3"
-gem "omniauth-twitter"
 gem "quiet_assets", ">= 1.0.2", :group => :development
 gem "better_errors", ">= 0.7.2", :group => :development
 gem "binding_of_caller", ">= 0.7.1", :group => :development, :platforms => [:mri_19, :rbx]
