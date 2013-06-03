@@ -3,6 +3,8 @@ OmniAuth LTI Example Application
 
 This web application is a basic web application for demoing the use of the [omniauth-lti][] gem. 
 
+There is a live example in http://omniauth-lti-example.herokuapp.com
+
 Installation
 ============
 
@@ -10,7 +12,7 @@ Clone this repository and set up the database with `rake db:migrate`.
 
 Set up a tool\_provider in your LTI consumer with:
 
-* `/sessions/create` as the launch_url
+* `/auth/lti/callback` as the launch_url (f.i.: http://omniauth-lti-example.herokuapp.com/auth/lti/callback)
 * `test` as the key
 * `secret` as the secret
 
