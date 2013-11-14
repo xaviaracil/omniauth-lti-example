@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Omniauth-lti-example by xaviaracil</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Omniauth-lti-example</h1>
+        <p>Example App for omniauth-lti gem</p>
+
+        <p class="view"><a href="https://github.com/xaviaracil/omniauth-lti-example">View the Project on GitHub <small>xaviaracil/omniauth-lti-example</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/xaviaracil/omniauth-lti-example/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/xaviaracil/omniauth-lti-example/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/xaviaracil/omniauth-lti-example">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="omniauth-lti-example-application" class="anchor" href="#omniauth-lti-example-application"><span class="octicon octicon-link"></span></a>OmniAuth LTI Example Application</h1>
+
+<p>This web application is a basic web application for demoing the use of the <a href="https://github.com/xaviaracil/omniauth-lti">omniauth-lti</a> gem. </p>
+
+<p>There is a live example in <a href="http://omniauth-lti-example.herokuapp.com">http://omniauth-lti-example.herokuapp.com</a></p>
+
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Clone this repository and set up the database with <code>rake db:migrate</code>.</p>
+
+<p>Set up a tool_provider in your LTI consumer with:</p>
+
+<ul>
+<li>
+<code>/auth/lti/callback</code> as the launch_url (f.i.: <a href="http://omniauth-lti-example.herokuapp.com/auth/lti/callback">http://omniauth-lti-example.herokuapp.com/auth/lti/callback</a>)</li>
+<li>
+<code>test</code> as the key</li>
+<li>
+<code>secret</code> as the secret</li>
+</ul><h1>
+<a name="how-to-add-omniauth-lti" class="anchor" href="#how-to-add-omniauth-lti"><span class="octicon octicon-link"></span></a>How to add Omniauth-LTI</h1>
+
+<p>The steps done in this application for authenticating using <a href="https://github.com/xaviaracil/omniauth-lti">omniauth-lti</a> are:</p>
+
+<h2>
+<a name="1-add-the-gem" class="anchor" href="#1-add-the-gem"><span class="octicon octicon-link"></span></a>1. Add the gem</h2>
+
+<p>Add the <a href="https://github.com/xaviaracil/omniauth-lti">omniauth-lti</a> gem in you Gemfile:</p>
+
+<pre><code>gem 'omniauth-lti'
+</code></pre>
+
+<p>Run bundle install for downloading and installing the gem:</p>
+
+<pre><code>bundle install --without production
+</code></pre>
+
+<h2>
+<a name="2-set-up" class="anchor" href="#2-set-up"><span class="octicon octicon-link"></span></a>2. Set up</h2>
+
+<p>Edit (or create) an initializer <code>config/initializers/omniauth.rb</code>, adding the lti omniauth strategy:</p>
+
+<pre><code>Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :lti, :oauth_credentials =&gt; LTI_CREDENTIALS_HASH
+end
+</code></pre>
+
+<p>Create <code>config/initializers/lti.rb</code>, enabling Oauth 1.0 support:</p>
+
+<pre><code># You also need to explicitly enable OAuth 1 support in the environment.rb or an initializer:
+OAUTH_10_SUPPORT = true
+</code></pre>
+
+<p>If the credentials of your tool consumers are static, add them here too:</p>
+
+<pre><code># Tool consumer credentials
+LTI_CREDENTIALS_HASH = {:test =&gt; 'secret'}
+</code></pre>
+
+<p>Set up the omniauth route, if not set up yet. Edit your <code>config/routes.rb</code>, adding the line:</p>
+
+<pre><code># set the route for omniauth
+post '/auth/:provider/callback', to: 'sessions#create'
+</code></pre>
+
+<p><em>Note</em> that the HTTP method for the route is POST.
+<em>Note</em> that there is no request phase in this authentication mechanism. That is because LTI spec defines the 
+authentication from the LTI consumer to the LTI provider (this webapp).</p>
+
+<h2>
+<a name="3-include-module" class="anchor" href="#3-include-module"><span class="octicon octicon-link"></span></a>3. Include Module</h2>
+
+<p>Include <code>Omniauth::Lti::Context</code> in your <code>application_controller.rb</code>:</p>
+
+<pre><code>class ApplicationController &lt; ActionController::Base
+  ...
+
+  # Include LTI context for accessing it in our views and actions
+  include Omniauth::Lti::Context
+
+  ...
+end
+</code></pre>
+
+<h2>
+<a name="4-save-and-use-the-context" class="anchor" href="#4-save-and-use-the-context"><span class="octicon octicon-link"></span></a>4. Save and use the context</h2>
+
+<p>If you want to use the LTI context in your application, first you'll have to save it. 
+Call <code>save_lti_contex</code>t when you are creating the sessions (typically in <code>SessionsController\#create</code> in a normal Omniauth application)</p>
+
+<p>The context is saved for use anywhere in your application, just call</p>
+
+<pre><code>lti_tool_provider
+</code></pre>
+
+<p>for retriving it. For instance, in <code>app/views/user/show.html.haml</code>:</p>
+
+<pre><code>%p
+    This application has been launched from 
+    %code
+        =lti_tool_provider.resource_link_title
+        (
+        =lti_tool_provider.resource_link_id
+        )
+%p
+    The key used for the tool_provider is
+    %code=lti_tool_provider.consumer_key
+    and the secret is
+    %code=lti_tool_provider.consumer_secret 
+</code></pre>
+
+<p><em>Get the secret</em> In order to get the consumer_secret, needed for making outcome calls, you'll have to pass 
+to the LTI context a hash of tool_consumer credentials, where the key is the consumer_key and the value is the consumer_secret.</p>
+
+<p>To pass this hash you'll have to call <code>lti_credentials=</code> in your controller, as below:</p>
+
+<pre><code>class UserController &lt; ApplicationController
+  before_filter :set_lti_credentials
+
+  ... 
+
+  private 
+
+  # set tool consumer credentials in LTI context
+  def set_lti_credentials
+    self.lti_credentials = LTI_CREDENTIALS_HASH
+  end
+end
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/xaviaracil">xaviaracil</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
